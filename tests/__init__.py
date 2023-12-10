@@ -1,2 +1,2 @@
 #!/usr/bin/python3
-"""init filr inside tests"""
+"""init file inside tests"""
