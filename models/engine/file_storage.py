@@ -17,17 +17,24 @@ class FileStorage:
     def new(self, obj):
         """sets a new obj in __objects dictionary"""
         FileStorage.__objects["{}.{}".format(obj.__class__.__name__,
-                                             obj.id)] = obj.to_dict()
+                                             obj.id)] = obj
 
     def save(self):
         """serializes __objects into json file with path __file_path"""
+        obj_dict = {}
+        for k in FileStorage.__objects.keys():
+            obj_dict[k] = FileStorage.__objects[k].to_dict()
         with open(FileStorage.__file_path, 'w', encoding='utf-8') as f:
-            json.dump(FileStorage.__objects, f)
+            json.dump(obj_dict, f)
 
     def reload(self):
         """deserializes file to __objects"""
         try:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                FileStorage.__objects = json.load(f)
+                obj_dict = json.load(f)
         except FileNotFoundError:
             return
+        for v in obj_dict.values():
+            cls_name = v["__class__"]
+            del v["__class__"]
+            self.new(eval(cls_name)(**v))

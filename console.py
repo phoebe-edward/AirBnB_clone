@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """console"""
 import cmd
+from models.base_model import BaseModel
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -23,6 +25,98 @@ class HBNBCommand(cmd.Cmd):
         """do nothing upon empty line and enter
         """
         pass
+
+    def do_create(self, arg):
+        """creates a new BaseModel
+        """
+        if len(arg) == 0:
+            print("** class name missing **")
+        elif arg == "BaseModel":
+            BM = BaseModel()
+            BM.save()
+            print(BM.id)
+        else:
+            print("** class doesn't exist **")
+
+    def do_show(self, arg):
+        """shows the instance with given id
+        """
+        if len(arg) == 0:
+            print("** class name missing **")
+        elif arg.split()[0] != "BaseModel":
+            print("** class doesn't exist **")
+        elif len(arg.split()) == 1:
+            print("** instance id missing **")
+        elif ("{}.{}".format(arg.split()[0],
+                             arg.split()[1])) not in (storage.all()).keys():
+            print("** no instance found **")
+        else:
+            objs = storage.all()
+            print(objs["{}.{}".format(arg.split()[0], arg.split()[1])])
+
+    def do_destroy(self, arg):
+        """destroys the instance with given id
+        """
+        if len(arg) == 0:
+            print("** class name missing **")
+        elif arg.split()[0] != "BaseModel":
+            print("** class doesn't exist **")
+        elif len(arg.split()) == 1:
+            print("** instance id missing **")
+        elif ("{}.{}".format(arg.split()[0],
+                             arg.split()[1])) not in (storage.all()).keys():
+            print("** no instance found **")
+        else:
+            objs = storage.all()
+            del objs["{}.{}".format(arg.split()[0], arg.split()[1])]
+            storage.save()
+
+    def do_all(self, arg):
+        """prints all string representations of all instances
+        based or not on the class name
+        """
+        if len(arg) == 0:
+            objs = storage.all()
+            str_arr = []
+            for k, v in objs.items():
+                str_arr.append(v.__str__())
+            print(str_arr)
+        elif arg.split()[0] != "BaseModel":
+            print("** class doesn't exist **")
+        elif arg.split()[0] == "BaseModel":
+            str_arr = []
+            objs = storage.all()
+            for k, v in objs.items():
+                if k.split(".")[0] == "BaseModel":
+                    str_arr.append(v.__str__())
+            print(str_arr)
+
+    def do_update(self, arg):
+        """updates obj based on args passed
+        """
+        if len(arg) == 0:
+            print("** class name missing **")
+        elif arg.split()[0] != "BaseModel":
+            print("** class doesn't exist **")
+        elif len(arg.split()) == 1:
+            print("** instance id missing **")
+        elif ("{}.{}".format(arg.split()[0],
+                             arg.split()[1])) not in (storage.all()).keys():
+            print("** no instance found **")
+        elif len(arg.split()) == 2:
+            print("** attribute name missing **")
+        elif len(arg.split()) == 3:
+            print("** value missing **")
+        else:
+            argl = arg.split()
+            objs = storage.all()
+            obj = objs["{}.{}".format(argl[0], argl[1])]
+            if argl[2] in obj.__class__.__dict__.keys():
+                type_v = type(obj.__class__.__dict__[argl[2]])
+                obj.__dict__[argl[2]] = type_v(argl[3])
+            else:
+                obj.__dict__[argl[2]] = argl[3]
+            storage.save()
 
 
 if __name__ == "__main__":
