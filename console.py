@@ -2,6 +2,7 @@
 """console"""
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
 
 
@@ -9,6 +10,8 @@ class HBNBCommand(cmd.Cmd):
     """class HBNBCommand"""
 
     prompt = "(hbnb) "
+    __classes = {"BaseModel",
+                 "User"}
 
     def do_quit(self, arg):
         """Quit command to exit the program
@@ -31,8 +34,8 @@ class HBNBCommand(cmd.Cmd):
         """
         if len(arg) == 0:
             print("** class name missing **")
-        elif arg == "BaseModel":
-            BM = BaseModel()
+        elif arg in HBNBCommand.__classes:
+            BM = eval(arg)()
             BM.save()
             print(BM.id)
         else:
@@ -43,7 +46,7 @@ class HBNBCommand(cmd.Cmd):
         """
         if len(arg) == 0:
             print("** class name missing **")
-        elif arg.split()[0] != "BaseModel":
+        elif arg.split()[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(arg.split()) == 1:
             print("** instance id missing **")
@@ -59,7 +62,7 @@ class HBNBCommand(cmd.Cmd):
         """
         if len(arg) == 0:
             print("** class name missing **")
-        elif arg.split()[0] != "BaseModel":
+        elif arg.split()[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(arg.split()) == 1:
             print("** instance id missing **")
@@ -81,13 +84,16 @@ class HBNBCommand(cmd.Cmd):
             for k, v in objs.items():
                 str_arr.append(v.__str__())
             print(str_arr)
-        elif arg.split()[0] != "BaseModel":
+        elif arg.split()[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
-        elif arg.split()[0] == "BaseModel":
+        else:
+            for c in HBNBCommand.__classes:
+                if c == arg.split()[0]:
+                    break
             str_arr = []
             objs = storage.all()
             for k, v in objs.items():
-                if k.split(".")[0] == "BaseModel":
+                if k.split(".")[0] == c:
                     str_arr.append(v.__str__())
             print(str_arr)
 
@@ -96,7 +102,7 @@ class HBNBCommand(cmd.Cmd):
         """
         if len(arg) == 0:
             print("** class name missing **")
-        elif arg.split()[0] != "BaseModel":
+        elif arg.split()[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(arg.split()) == 1:
             print("** instance id missing **")
