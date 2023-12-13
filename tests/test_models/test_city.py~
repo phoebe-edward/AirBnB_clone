@@ -21,7 +21,7 @@ class test_others(unittest.TestCase):
         bm3 = City()
         bm4 = Amenity()
         bm5 = Place()
-        bm6 = Review
+        bm6 = Review()
         self.assertEqual(bm1.email, "")
         self.assertEqual(bm1.password, "")
         self.assertEqual(bm1.first_name, "")
